@@ -31,16 +31,16 @@ ORDER BY ParcelID
 SELECT a.ParcelID, a.PropertyAddress, b.ParcelID, b.PropertyAddress, ISNULL(a.PropertyAddress, b.PropertyAddress)
 FROM HousingData a
 JOIN HousingData b
-	ON a.ParcelID = b.ParcelID
-	AND a.[UniqueID ] <> b.[UniqueID ]
+     ON a.ParcelID = b.ParcelID
+     AND a.[UniqueID ] <> b.[UniqueID ]
 WHERE a.PropertyAddress IS NULL
 
 UPDATE a
 SET PropertyAddress = ISNULL(a.PropertyAddress, b.PropertyAddress)
 FROM HousingData a
 JOIN HousingData b
-	ON a.ParcelID = b.ParcelID
-	AND a.[UniqueID ] <> b.[UniqueID ]
+     ON a.ParcelID = b.ParcelID
+     AND a.[UniqueID ] <> b.[UniqueID ]
 WHERE a.PropertyAddress IS NULL
 
 
@@ -52,16 +52,16 @@ SELECT PropertyAddress
 FROM HousingData
 
 SELECT SUBSTRING(PropertyAddress, 1, CHARINDEX(',', PropertyAddress) - 1) AS Address,
-	   SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress) + 1, LEN(PropertyAddress)) AS City
+       SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress) + 1, LEN(PropertyAddress)) AS City
 FROM HousingData
 
 ALTER TABLE HousingData
 Add PropAdd nvarchar(255),
-	PropCity nvarchar(255);
+    PropCity nvarchar(255);
 
 UPDATE HousingData
 SET PropAdd = SUBSTRING(PropertyAddress, 1, CHARINDEX(',', PropertyAddress) - 1),
-	PropCity = SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress) + 1, LEN(PropertyAddress))
+    PropCity = SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress) + 1, LEN(PropertyAddress))
 
 SELECT *
 FROM HousingData
@@ -72,19 +72,19 @@ SELECT OwnerAddress
 FROM HousingData
 
 SELECT PARSENAME(REPLACE(OwnerAddress, ',', '.') , 3),
-	   PARSENAME(REPLACE(OwnerAddress, ',', '.') , 2),
-	   PARSENAME(REPLACE(OwnerAddress, ',', '.') , 1)
+       PARSENAME(REPLACE(OwnerAddress, ',', '.') , 2),
+       PARSENAME(REPLACE(OwnerAddress, ',', '.') , 1)
 FROM HousingData
 
 ALTER TABLE HousingData
 Add OwnAdd nvarchar(255),
-	OwnCity nvarchar(255),
-	OwnState nvarchar(255);
+    OwnCity nvarchar(255),
+    OwnState nvarchar(255);
 
 UPDATE HousingData
 SET OwnAdd = PARSENAME(REPLACE(OwnerAddress, ',', '.') , 3),
-	OwnCity = PARSENAME(REPLACE(OwnerAddress, ',', '.') , 2),
-	OwnState = PARSENAME(REPLACE(OwnerAddress, ',', '.') , 1)
+    OwnCity = PARSENAME(REPLACE(OwnerAddress, ',', '.') , 2),
+    OwnState = PARSENAME(REPLACE(OwnerAddress, ',', '.') , 1)
 
 SELECT *
 FROM HousingData
@@ -99,17 +99,17 @@ GROUP BY SoldAsVacant
 ORDER BY 2
 
 SELECT SoldAsVacant,
-	CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
-		 WHEN SoldAsVacant = 'N' THEN 'No'
-		 ELSE SoldAsVacant
-		 END
+       CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
+	    WHEN SoldAsVacant = 'N' THEN 'No'
+	    ELSE SoldAsVacant
+	    END
 FROM HousingData
 
 UPDATE HousingData
 SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
-				   WHEN SoldAsVacant = 'N' THEN 'No'
-				   ELSE SoldAsVacant
-				   END
+			WHEN SoldAsVacant = 'N' THEN 'No'
+			ELSE SoldAsVacant
+			END
 
 
 -------------------------------------------------------------------------------------------------------------------------------
@@ -118,12 +118,12 @@ SET SoldAsVacant = CASE WHEN SoldAsVacant = 'Y' THEN 'Yes'
 -- Find duplicate rows
 WITH RowNumCTE AS (
 SELECT *,
-	   ROW_NUMBER() OVER ( PARTITION BY ParcelID,
-									  PropertyAddress,
-									  SalePrice,
-									  SaleDate,
-									  LegalReference
-					ORDER BY UniqueID) row_num
+       ROW_NUMBER() OVER ( PARTITION BY ParcelID, 
+					PropertyAddress,
+					SalePrice,
+					SaleDate,
+					LegalReference
+			   ORDER BY UniqueID) row_num
 FROM HousingData
 )
 SELECT *
@@ -134,12 +134,12 @@ ORDER BY PropertyAddress
 -- Remove duplicates
 WITH RowNumCTE AS (
 SELECT *,
-	   ROW_NUMBER() OVER ( PARTITION BY ParcelID,
-									  PropertyAddress,
-									  SalePrice,
-									  SaleDate,
-									  LegalReference
-					ORDER BY UniqueID) row_num
+       ROW_NUMBER() OVER ( PARTITION BY ParcelID,
+					PropertyAddress,
+					SalePrice,
+					SaleDate,
+					LegalReference
+			   ORDER BY UniqueID) row_num
 FROM HousingData
 )
 DELETE
